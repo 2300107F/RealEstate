@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using RealEstate.Domain;
+using RealEstate.Data;
 
 namespace RealEstate.Data
 {
-    public class RealEstateContext : DbContext
+    public class RealEstateContext(DbContextOptions<RealEstateContext> options) : IdentityDbContext<RealEstateUser>(options)
     {
-        public RealEstateContext (DbContextOptions<RealEstateContext> options)
-            : base(options)
-        {
-        }
-
         public DbSet<RealEstate.Domain.User> User { get; set; } = default!;
     }
+
+    
 }
