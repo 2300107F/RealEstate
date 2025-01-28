@@ -1,0 +1,99 @@
+﻿@page "/companies/edit"
+@using Microsoft.EntityFrameworkCore
+@using RealEstate.Domain
+@inject IDbContextFactory<RealEstate.Data.RealEstateContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Company</h2>
+<hr />
+@if (Company is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Company" OnValidSubmit="UpdateCompany" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Company.CompanyId" value="@Company.CompanyId" />
+                <div class="mb-3">
+                    <label for="companyname" class="form-label">CompanyName:</label>
+                    <InputText id="companyname" @bind-Value="Company.CompanyName" class="form-control" />
+                    <ValidationMessage For="() => Company.CompanyName" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="companyaddress" class="form-label">CompanyAddress:</label>
+                    <InputText id="companyaddress" @bind-Value="Company.CompanyAddress" class="form-control" />
+                    <ValidationMessage For="() => Company.CompanyAddress" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="companyphonenumber" class="form-label">CompanyPhoneNumber:</label>
+                    <InputText id="companyphonenumber" @bind-Value="Company.CompanyPhoneNumber" class="form-control" />
+                    <ValidationMessage For="() => Company.CompanyPhoneNumber" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/companies">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int CompanyId { get; set; }
+
+    [SupplyParameterFromForm]
+    private Company? Company { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Company ??= await context.Company.FirstOrDefaultAsync(m => m.CompanyId == CompanyId);
+
+        if (Company is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateCompany()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Company!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!CompanyExists(Company!.CompanyId))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/companies");
+    }
+
+    private bool CompanyExists(int companyid)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Company.Any(e => e.CompanyId == companyid);
+    }
+}

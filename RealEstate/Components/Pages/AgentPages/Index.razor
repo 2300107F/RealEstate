@@ -1,0 +1,41 @@
+﻿@page "/agents"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using RealEstate.Domain
+@using RealEstate.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<RealEstate.Data.RealEstateContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="agents/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Agent">
+    <PropertyColumn Property="agent => agent.Name" />
+    <PropertyColumn Property="agent => agent.Email" />
+    <PropertyColumn Property="agent => agent.Password" />
+    <PropertyColumn Property="agent => agent.AgentPhoneNumber" />
+    <PropertyColumn Property="agent => agent.LicenseNumber" />
+    <PropertyColumn Property="agent => agent.CompanyId" />
+
+    <TemplateColumn Context="agent">
+        <a href="@($"agents/edit?agentid={agent.AgentId}")">Edit</a> |
+        <a href="@($"agents/details?agentid={agent.AgentId}")">Details</a> |
+        <a href="@($"agents/delete?agentid={agent.AgentId}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private RealEstateContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

@@ -1,0 +1,48 @@
+﻿@page "/propertyimages/details"
+@using Microsoft.EntityFrameworkCore
+@using RealEstate.Domain
+@inject IDbContextFactory<RealEstate.Data.RealEstateContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>PropertyImage</h2>
+    <hr />
+    @if (propertyimage is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">FilePath</dt>
+            <dd class="col-sm-10">@propertyimage.FilePath</dd>
+            <dt class="col-sm-2">PropertyId</dt>
+            <dd class="col-sm-10">@propertyimage.PropertyId</dd>
+        </dl>
+        <div>
+            <a href="@($"/propertyimages/edit?propertyimageid={propertyimage.PropertyImageId}")">Edit</a> |
+            <a href="@($"/propertyimages")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private PropertyImage? propertyimage;
+
+    [SupplyParameterFromQuery]
+    private int PropertyImageId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        propertyimage = await context.PropertyImage.FirstOrDefaultAsync(m => m.PropertyImageId == PropertyImageId);
+
+        if (propertyimage is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

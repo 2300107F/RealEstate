@@ -1,0 +1,63 @@
+﻿@page "/companies/delete"
+@using Microsoft.EntityFrameworkCore
+@using RealEstate.Domain
+@inject IDbContextFactory<RealEstate.Data.RealEstateContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Delete</PageTitle>
+
+<h1>Delete</h1>
+
+<p>Are you sure you want to delete this?</p>
+<div>
+    <h2>Company</h2>
+    <hr />
+    @if (company is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">CompanyName</dt>
+            <dd class="col-sm-10">@company.CompanyName</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">CompanyAddress</dt>
+            <dd class="col-sm-10">@company.CompanyAddress</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">CompanyPhoneNumber</dt>
+            <dd class="col-sm-10">@company.CompanyPhoneNumber</dd>
+        </dl>
+        <EditForm method="post" Model="company" OnValidSubmit="DeleteCompany" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(company is null)">Delete</button> |
+            <a href="/companies">Back to List</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private Company? company;
+
+    [SupplyParameterFromQuery]
+    private int CompanyId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        company = await context.Company.FirstOrDefaultAsync(m => m.CompanyId == CompanyId);
+
+        if (company is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    private async Task DeleteCompany()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Company.Remove(company!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/companies");
+    }
+}

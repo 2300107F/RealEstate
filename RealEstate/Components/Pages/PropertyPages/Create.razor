@@ -1,0 +1,108 @@
+﻿@page "/properties/create"
+@using Microsoft.AspNetCore.Mvc
+@using Microsoft.EntityFrameworkCore
+@using RealEstate.Domain
+@inject IDbContextFactory<RealEstate.Data.RealEstateContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Property</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Property" OnValidSubmit="AddProperty" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="address" class="form-label">Address:</label> 
+                <InputText id="address" @bind-Value="Property.Address" class="form-control" /> 
+                <ValidationMessage For="() => Property.Address" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="state" class="form-label">State:</label> 
+                <InputText id="state" @bind-Value="Property.State" class="form-control" /> 
+                <ValidationMessage For="() => Property.State" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="city" class="form-label">City:</label> 
+                <InputText id="city" @bind-Value="Property.City" class="form-control" /> 
+                <ValidationMessage For="() => Property.City" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="postalcode" class="form-label">PostalCode:</label> 
+                <InputText id="postalcode" @bind-Value="Property.PostalCode" class="form-control" /> 
+                <ValidationMessage For="() => Property.PostalCode" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="price" class="form-label">Price:</label> 
+                <InputNumber id="price" @bind-Value="Property.Price" class="form-control" /> 
+                <ValidationMessage For="() => Property.Price" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="propertytype" class="form-label">PropertyType:</label> 
+                <InputText id="propertytype" @bind-Value="Property.PropertyType" class="form-control" /> 
+                <ValidationMessage For="() => Property.PropertyType" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="bedrooms" class="form-label">Bedrooms:</label> 
+                <InputNumber id="bedrooms" @bind-Value="Property.Bedrooms" class="form-control" /> 
+                <ValidationMessage For="() => Property.Bedrooms" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="bathrooms" class="form-label">Bathrooms:</label> 
+                <InputNumber id="bathrooms" @bind-Value="Property.Bathrooms" class="form-control" /> 
+                <ValidationMessage For="() => Property.Bathrooms" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="sqft" class="form-label">Sqft:</label> 
+                <InputNumber id="sqft" @bind-Value="Property.Sqft" class="form-control" /> 
+                <ValidationMessage For="() => Property.Sqft" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="status" class="form-label">Status:</label> 
+                <InputText id="status" @bind-Value="Property.Status" class="form-control" /> 
+                <ValidationMessage For="() => Property.Status" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="agentid" class="form-label">AgentId:</label> 
+                <InputNumber id="agentid" @bind-Value="Property.AgentId" class="form-control" /> 
+                <ValidationMessage For="() => Property.AgentId" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="regionid" class="form-label">RegionId:</label> 
+                <InputNumber id="regionid" @bind-Value="Property.RegionId" class="form-control" /> 
+                <ValidationMessage For="() => Property.RegionId" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/properties">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Property Property { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddProperty()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Property.Add(Property);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/properties");
+    }
+
+    // public IList<Agent> Agents { get; set; }
+
+    // public async Task<IActionResult> OnGetAsync()
+    // {
+    //     Agents = await _context.Agents.ToListAsync();
+    //     return Page();
+    // }
+}

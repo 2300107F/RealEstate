@@ -1,0 +1,39 @@
+﻿@page "/propertytransactions"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using RealEstate.Domain
+@using RealEstate.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<RealEstate.Data.RealEstateContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="propertytransactions/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.PropertyTransaction">
+    <PropertyColumn Property="propertytransaction => propertytransaction.Amount" />
+    <PropertyColumn Property="propertytransaction => propertytransaction.TransactionDate" />
+    <PropertyColumn Property="propertytransaction => propertytransaction.UserId" />
+    <PropertyColumn Property="propertytransaction => propertytransaction.PropertyId" />
+
+    <TemplateColumn Context="propertytransaction">
+        <a href="@($"propertytransactions/edit?propertytransactionid={propertytransaction.PropertyTransactionId}")">Edit</a> |
+        <a href="@($"propertytransactions/details?propertytransactionid={propertytransaction.PropertyTransactionId}")">Details</a> |
+        <a href="@($"propertytransactions/delete?propertytransactionid={propertytransaction.PropertyTransactionId}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private RealEstateContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

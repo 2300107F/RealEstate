@@ -1,0 +1,54 @@
+﻿@page "/facilities/create"
+@using Microsoft.EntityFrameworkCore
+@using RealEstate.Domain
+@inject IDbContextFactory<RealEstate.Data.RealEstateContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Facility</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Facility" OnValidSubmit="AddFacility" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="facilityname" class="form-label">FacilityName:</label> 
+                <InputText id="facilityname" @bind-Value="Facility.FacilityName" class="form-control" /> 
+                <ValidationMessage For="() => Facility.FacilityName" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="facilitydescription" class="form-label">FacilityDescription:</label> 
+                <InputText id="facilitydescription" @bind-Value="Facility.FacilityDescription" class="form-control" /> 
+                <ValidationMessage For="() => Facility.FacilityDescription" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="regionid" class="form-label">RegionId:</label> 
+                <InputNumber id="regionid" @bind-Value="Facility.RegionId" class="form-control" /> 
+                <ValidationMessage For="() => Facility.RegionId" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/facilities">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Facility Facility { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddFacility()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Facility.Add(Facility);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/facilities");
+    }
+}

@@ -1,0 +1,69 @@
+﻿@page "/agents/create"
+@using Microsoft.EntityFrameworkCore
+@using RealEstate.Domain
+@inject IDbContextFactory<RealEstate.Data.RealEstateContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Agent</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Agent" OnValidSubmit="AddAgent" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="name" class="form-label">Name:</label> 
+                <InputText id="name" @bind-Value="Agent.Name" class="form-control" /> 
+                <ValidationMessage For="() => Agent.Name" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="email" class="form-label">Email:</label> 
+                <InputText id="email" @bind-Value="Agent.Email" class="form-control" /> 
+                <ValidationMessage For="() => Agent.Email" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="password" class="form-label">Password:</label> 
+                <InputText id="password" @bind-Value="Agent.Password" class="form-control" /> 
+                <ValidationMessage For="() => Agent.Password" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="agentphonenumber" class="form-label">AgentPhoneNumber:</label> 
+                <InputText id="agentphonenumber" @bind-Value="Agent.AgentPhoneNumber" class="form-control" /> 
+                <ValidationMessage For="() => Agent.AgentPhoneNumber" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="licensenumber" class="form-label">LicenseNumber:</label> 
+                <InputText id="licensenumber" @bind-Value="Agent.LicenseNumber" class="form-control" /> 
+                <ValidationMessage For="() => Agent.LicenseNumber" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="companyid" class="form-label">CompanyId:</label> 
+                <InputNumber id="companyid" @bind-Value="Agent.CompanyId" class="form-control" /> 
+                <ValidationMessage For="() => Agent.CompanyId" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/agents">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Agent Agent { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddAgent()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Agent.Add(Agent);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/agents");
+    }
+}

@@ -1,0 +1,50 @@
+﻿@page "/companies/details"
+@using Microsoft.EntityFrameworkCore
+@using RealEstate.Domain
+@inject IDbContextFactory<RealEstate.Data.RealEstateContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Company</h2>
+    <hr />
+    @if (company is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">CompanyName</dt>
+            <dd class="col-sm-10">@company.CompanyName</dd>
+            <dt class="col-sm-2">CompanyAddress</dt>
+            <dd class="col-sm-10">@company.CompanyAddress</dd>
+            <dt class="col-sm-2">CompanyPhoneNumber</dt>
+            <dd class="col-sm-10">@company.CompanyPhoneNumber</dd>
+        </dl>
+        <div>
+            <a href="@($"/companies/edit?companyid={company.CompanyId}")">Edit</a> |
+            <a href="@($"/companies")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Company? company;
+
+    [SupplyParameterFromQuery]
+    private int CompanyId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        company = await context.Company.FirstOrDefaultAsync(m => m.CompanyId == CompanyId);
+
+        if (company is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

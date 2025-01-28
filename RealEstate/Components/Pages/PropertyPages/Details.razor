@@ -1,0 +1,68 @@
+﻿@page "/properties/details"
+@using Microsoft.EntityFrameworkCore
+@using RealEstate.Domain
+@inject IDbContextFactory<RealEstate.Data.RealEstateContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Property</h2>
+    <hr />
+    @if (property is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Address</dt>
+            <dd class="col-sm-10">@property.Address</dd>
+            <dt class="col-sm-2">State</dt>
+            <dd class="col-sm-10">@property.State</dd>
+            <dt class="col-sm-2">City</dt>
+            <dd class="col-sm-10">@property.City</dd>
+            <dt class="col-sm-2">PostalCode</dt>
+            <dd class="col-sm-10">@property.PostalCode</dd>
+            <dt class="col-sm-2">Price</dt>
+            <dd class="col-sm-10">@property.Price</dd>
+            <dt class="col-sm-2">PropertyType</dt>
+            <dd class="col-sm-10">@property.PropertyType</dd>
+            <dt class="col-sm-2">Bedrooms</dt>
+            <dd class="col-sm-10">@property.Bedrooms</dd>
+            <dt class="col-sm-2">Bathrooms</dt>
+            <dd class="col-sm-10">@property.Bathrooms</dd>
+            <dt class="col-sm-2">Sqft</dt>
+            <dd class="col-sm-10">@property.Sqft</dd>
+            <dt class="col-sm-2">Status</dt>
+            <dd class="col-sm-10">@property.Status</dd>
+            <dt class="col-sm-2">AgentId</dt>
+            <dd class="col-sm-10">@property.AgentId</dd>
+            <dt class="col-sm-2">RegionId</dt>
+            <dd class="col-sm-10">@property.RegionId</dd>
+        </dl>
+        <div>
+            <a href="@($"/properties/edit?propertyid={property.PropertyId}")">Edit</a> |
+            <a href="@($"/properties")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Property? property;
+
+    [SupplyParameterFromQuery]
+    private int PropertyId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        property = await context.Property.FirstOrDefaultAsync(m => m.PropertyId == PropertyId);
+
+        if (property is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

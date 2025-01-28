@@ -1,0 +1,59 @@
+﻿@page "/propertytransactions/create"
+@using Microsoft.EntityFrameworkCore
+@using RealEstate.Domain
+@inject IDbContextFactory<RealEstate.Data.RealEstateContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>PropertyTransaction</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="PropertyTransaction" OnValidSubmit="AddPropertyTransaction" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="amount" class="form-label">Amount:</label> 
+                <InputNumber id="amount" @bind-Value="PropertyTransaction.Amount" class="form-control" /> 
+                <ValidationMessage For="() => PropertyTransaction.Amount" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="transactiondate" class="form-label">TransactionDate:</label> 
+                <InputDate id="transactiondate" @bind-Value="PropertyTransaction.TransactionDate" class="form-control" /> 
+                <ValidationMessage For="() => PropertyTransaction.TransactionDate" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="userid" class="form-label">UserId:</label> 
+                <InputNumber id="userid" @bind-Value="PropertyTransaction.UserId" class="form-control" /> 
+                <ValidationMessage For="() => PropertyTransaction.UserId" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="propertyid" class="form-label">PropertyId:</label> 
+                <InputNumber id="propertyid" @bind-Value="PropertyTransaction.PropertyId" class="form-control" /> 
+                <ValidationMessage For="() => PropertyTransaction.PropertyId" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/propertytransactions">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private PropertyTransaction PropertyTransaction { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddPropertyTransaction()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.PropertyTransaction.Add(PropertyTransaction);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/propertytransactions");
+    }
+}

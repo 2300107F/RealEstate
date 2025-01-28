@@ -1,0 +1,104 @@
+﻿@page "/propertytransactions/edit"
+@using Microsoft.EntityFrameworkCore
+@using RealEstate.Domain
+@inject IDbContextFactory<RealEstate.Data.RealEstateContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>PropertyTransaction</h2>
+<hr />
+@if (PropertyTransaction is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="PropertyTransaction" OnValidSubmit="UpdatePropertyTransaction" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="PropertyTransaction.PropertyTransactionId" value="@PropertyTransaction.PropertyTransactionId" />
+                <div class="mb-3">
+                    <label for="amount" class="form-label">Amount:</label>
+                    <InputNumber id="amount" @bind-Value="PropertyTransaction.Amount" class="form-control" />
+                    <ValidationMessage For="() => PropertyTransaction.Amount" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="transactiondate" class="form-label">TransactionDate:</label>
+                    <InputDate id="transactiondate" @bind-Value="PropertyTransaction.TransactionDate" class="form-control" />
+                    <ValidationMessage For="() => PropertyTransaction.TransactionDate" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="userid" class="form-label">UserId:</label>
+                    <InputNumber id="userid" @bind-Value="PropertyTransaction.UserId" class="form-control" />
+                    <ValidationMessage For="() => PropertyTransaction.UserId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="propertyid" class="form-label">PropertyId:</label>
+                    <InputNumber id="propertyid" @bind-Value="PropertyTransaction.PropertyId" class="form-control" />
+                    <ValidationMessage For="() => PropertyTransaction.PropertyId" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/propertytransactions">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int PropertyTransactionId { get; set; }
+
+    [SupplyParameterFromForm]
+    private PropertyTransaction? PropertyTransaction { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        PropertyTransaction ??= await context.PropertyTransaction.FirstOrDefaultAsync(m => m.PropertyTransactionId == PropertyTransactionId);
+
+        if (PropertyTransaction is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdatePropertyTransaction()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(PropertyTransaction!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!PropertyTransactionExists(PropertyTransaction!.PropertyTransactionId))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/propertytransactions");
+    }
+
+    private bool PropertyTransactionExists(int propertytransactionid)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.PropertyTransaction.Any(e => e.PropertyTransactionId == propertytransactionid);
+    }
+}

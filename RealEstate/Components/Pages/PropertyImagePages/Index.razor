@@ -1,0 +1,37 @@
+﻿@page "/propertyimages"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using RealEstate.Domain
+@using RealEstate.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<RealEstate.Data.RealEstateContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="propertyimages/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.PropertyImage">
+    <PropertyColumn Property="propertyimage => propertyimage.FilePath" />
+    <PropertyColumn Property="propertyimage => propertyimage.PropertyId" />
+
+    <TemplateColumn Context="propertyimage">
+        <a href="@($"propertyimages/edit?propertyimageid={propertyimage.PropertyImageId}")">Edit</a> |
+        <a href="@($"propertyimages/details?propertyimageid={propertyimage.PropertyImageId}")">Details</a> |
+        <a href="@($"propertyimages/delete?propertyimageid={propertyimage.PropertyImageId}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private RealEstateContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

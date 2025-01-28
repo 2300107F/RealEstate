@@ -1,0 +1,94 @@
+﻿@page "/propertyimages/edit"
+@using Microsoft.EntityFrameworkCore
+@using RealEstate.Domain
+@inject IDbContextFactory<RealEstate.Data.RealEstateContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>PropertyImage</h2>
+<hr />
+@if (PropertyImage is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="PropertyImage" OnValidSubmit="UpdatePropertyImage" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="PropertyImage.PropertyImageId" value="@PropertyImage.PropertyImageId" />
+                <div class="mb-3">
+                    <label for="filepath" class="form-label">FilePath:</label>
+                    <InputText id="filepath" @bind-Value="PropertyImage.FilePath" class="form-control" />
+                    <ValidationMessage For="() => PropertyImage.FilePath" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="propertyid" class="form-label">PropertyId:</label>
+                    <InputNumber id="propertyid" @bind-Value="PropertyImage.PropertyId" class="form-control" />
+                    <ValidationMessage For="() => PropertyImage.PropertyId" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/propertyimages">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int PropertyImageId { get; set; }
+
+    [SupplyParameterFromForm]
+    private PropertyImage? PropertyImage { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        PropertyImage ??= await context.PropertyImage.FirstOrDefaultAsync(m => m.PropertyImageId == PropertyImageId);
+
+        if (PropertyImage is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdatePropertyImage()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(PropertyImage!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!PropertyImageExists(PropertyImage!.PropertyImageId))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/propertyimages");
+    }
+
+    private bool PropertyImageExists(int propertyimageid)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.PropertyImage.Any(e => e.PropertyImageId == propertyimageid);
+    }
+}

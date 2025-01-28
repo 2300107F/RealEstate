@@ -1,0 +1,109 @@
+﻿@page "/inquiries/edit"
+@using Microsoft.EntityFrameworkCore
+@using RealEstate.Domain
+@inject IDbContextFactory<RealEstate.Data.RealEstateContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Inquiry</h2>
+<hr />
+@if (Inquiry is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Inquiry" OnValidSubmit="UpdateInquiry" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Inquiry.InquiryId" value="@Inquiry.InquiryId" />
+                <div class="mb-3">
+                    <label for="dateofinquiry" class="form-label">DateOfInquiry:</label>
+                    <InputDate id="dateofinquiry" @bind-Value="Inquiry.DateOfInquiry" class="form-control" />
+                    <ValidationMessage For="() => Inquiry.DateOfInquiry" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="message" class="form-label">Message:</label>
+                    <InputText id="message" @bind-Value="Inquiry.Message" class="form-control" />
+                    <ValidationMessage For="() => Inquiry.Message" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="status" class="form-label">Status:</label>
+                    <InputText id="status" @bind-Value="Inquiry.Status" class="form-control" />
+                    <ValidationMessage For="() => Inquiry.Status" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="userid" class="form-label">UserId:</label>
+                    <InputNumber id="userid" @bind-Value="Inquiry.UserId" class="form-control" />
+                    <ValidationMessage For="() => Inquiry.UserId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="propertyid" class="form-label">PropertyId:</label>
+                    <InputNumber id="propertyid" @bind-Value="Inquiry.PropertyId" class="form-control" />
+                    <ValidationMessage For="() => Inquiry.PropertyId" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/inquiries">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int InquiryId { get; set; }
+
+    [SupplyParameterFromForm]
+    private Inquiry? Inquiry { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Inquiry ??= await context.Inquiry.FirstOrDefaultAsync(m => m.InquiryId == InquiryId);
+
+        if (Inquiry is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateInquiry()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Inquiry!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!InquiryExists(Inquiry!.InquiryId))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/inquiries");
+    }
+
+    private bool InquiryExists(int inquiryid)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Inquiry.Any(e => e.InquiryId == inquiryid);
+    }
+}

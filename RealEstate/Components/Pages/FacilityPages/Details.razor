@@ -1,0 +1,50 @@
+﻿@page "/facilities/details"
+@using Microsoft.EntityFrameworkCore
+@using RealEstate.Domain
+@inject IDbContextFactory<RealEstate.Data.RealEstateContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Facility</h2>
+    <hr />
+    @if (facility is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">FacilityName</dt>
+            <dd class="col-sm-10">@facility.FacilityName</dd>
+            <dt class="col-sm-2">FacilityDescription</dt>
+            <dd class="col-sm-10">@facility.FacilityDescription</dd>
+            <dt class="col-sm-2">RegionId</dt>
+            <dd class="col-sm-10">@facility.RegionId</dd>
+        </dl>
+        <div>
+            <a href="@($"/facilities/edit?facilityid={facility.FacilityId}")">Edit</a> |
+            <a href="@($"/facilities")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Facility? facility;
+
+    [SupplyParameterFromQuery]
+    private int FacilityId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        facility = await context.Facility.FirstOrDefaultAsync(m => m.FacilityId == FacilityId);
+
+        if (facility is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

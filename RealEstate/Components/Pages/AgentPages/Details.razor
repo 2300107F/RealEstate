@@ -1,0 +1,56 @@
+﻿@page "/agents/details"
+@using Microsoft.EntityFrameworkCore
+@using RealEstate.Domain
+@inject IDbContextFactory<RealEstate.Data.RealEstateContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Agent</h2>
+    <hr />
+    @if (agent is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Name</dt>
+            <dd class="col-sm-10">@agent.Name</dd>
+            <dt class="col-sm-2">Email</dt>
+            <dd class="col-sm-10">@agent.Email</dd>
+            <dt class="col-sm-2">Password</dt>
+            <dd class="col-sm-10">@agent.Password</dd>
+            <dt class="col-sm-2">AgentPhoneNumber</dt>
+            <dd class="col-sm-10">@agent.AgentPhoneNumber</dd>
+            <dt class="col-sm-2">LicenseNumber</dt>
+            <dd class="col-sm-10">@agent.LicenseNumber</dd>
+            <dt class="col-sm-2">CompanyId</dt>
+            <dd class="col-sm-10">@agent.CompanyId</dd>
+        </dl>
+        <div>
+            <a href="@($"/agents/edit?agentid={agent.AgentId}")">Edit</a> |
+            <a href="@($"/agents")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Agent? agent;
+
+    [SupplyParameterFromQuery]
+    private int AgentId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        agent = await context.Agent.FirstOrDefaultAsync(m => m.AgentId == AgentId);
+
+        if (agent is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

@@ -1,0 +1,52 @@
+﻿@page "/propertytransactions/details"
+@using Microsoft.EntityFrameworkCore
+@using RealEstate.Domain
+@inject IDbContextFactory<RealEstate.Data.RealEstateContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>PropertyTransaction</h2>
+    <hr />
+    @if (propertytransaction is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Amount</dt>
+            <dd class="col-sm-10">@propertytransaction.Amount</dd>
+            <dt class="col-sm-2">TransactionDate</dt>
+            <dd class="col-sm-10">@propertytransaction.TransactionDate</dd>
+            <dt class="col-sm-2">UserId</dt>
+            <dd class="col-sm-10">@propertytransaction.UserId</dd>
+            <dt class="col-sm-2">PropertyId</dt>
+            <dd class="col-sm-10">@propertytransaction.PropertyId</dd>
+        </dl>
+        <div>
+            <a href="@($"/propertytransactions/edit?propertytransactionid={propertytransaction.PropertyTransactionId}")">Edit</a> |
+            <a href="@($"/propertytransactions")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private PropertyTransaction? propertytransaction;
+
+    [SupplyParameterFromQuery]
+    private int PropertyTransactionId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        propertytransaction = await context.PropertyTransaction.FirstOrDefaultAsync(m => m.PropertyTransactionId == PropertyTransactionId);
+
+        if (propertytransaction is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

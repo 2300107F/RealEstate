@@ -1,0 +1,64 @@
+﻿@page "/inquiries/create"
+@using Microsoft.EntityFrameworkCore
+@using RealEstate.Domain
+@inject IDbContextFactory<RealEstate.Data.RealEstateContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Inquiry</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Inquiry" OnValidSubmit="AddInquiry" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="dateofinquiry" class="form-label">DateOfInquiry:</label> 
+                <InputDate id="dateofinquiry" @bind-Value="Inquiry.DateOfInquiry" class="form-control" /> 
+                <ValidationMessage For="() => Inquiry.DateOfInquiry" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="message" class="form-label">Message:</label> 
+                <InputText id="message" @bind-Value="Inquiry.Message" class="form-control" /> 
+                <ValidationMessage For="() => Inquiry.Message" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="status" class="form-label">Status:</label> 
+                <InputText id="status" @bind-Value="Inquiry.Status" class="form-control" /> 
+                <ValidationMessage For="() => Inquiry.Status" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="userid" class="form-label">UserId:</label> 
+                <InputNumber id="userid" @bind-Value="Inquiry.UserId" class="form-control" /> 
+                <ValidationMessage For="() => Inquiry.UserId" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="propertyid" class="form-label">PropertyId:</label> 
+                <InputNumber id="propertyid" @bind-Value="Inquiry.PropertyId" class="form-control" /> 
+                <ValidationMessage For="() => Inquiry.PropertyId" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/inquiries">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Inquiry Inquiry { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddInquiry()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Inquiry.Add(Inquiry);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/inquiries");
+    }
+}

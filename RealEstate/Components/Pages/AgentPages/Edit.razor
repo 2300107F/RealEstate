@@ -1,0 +1,114 @@
+﻿@page "/agents/edit"
+@using Microsoft.EntityFrameworkCore
+@using RealEstate.Domain
+@inject IDbContextFactory<RealEstate.Data.RealEstateContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Agent</h2>
+<hr />
+@if (Agent is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Agent" OnValidSubmit="UpdateAgent" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Agent.AgentId" value="@Agent.AgentId" />
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name:</label>
+                    <InputText id="name" @bind-Value="Agent.Name" class="form-control" />
+                    <ValidationMessage For="() => Agent.Name" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email:</label>
+                    <InputText id="email" @bind-Value="Agent.Email" class="form-control" />
+                    <ValidationMessage For="() => Agent.Email" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password:</label>
+                    <InputText id="password" @bind-Value="Agent.Password" class="form-control" />
+                    <ValidationMessage For="() => Agent.Password" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="agentphonenumber" class="form-label">AgentPhoneNumber:</label>
+                    <InputText id="agentphonenumber" @bind-Value="Agent.AgentPhoneNumber" class="form-control" />
+                    <ValidationMessage For="() => Agent.AgentPhoneNumber" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="licensenumber" class="form-label">LicenseNumber:</label>
+                    <InputText id="licensenumber" @bind-Value="Agent.LicenseNumber" class="form-control" />
+                    <ValidationMessage For="() => Agent.LicenseNumber" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="companyid" class="form-label">CompanyId:</label>
+                    <InputNumber id="companyid" @bind-Value="Agent.CompanyId" class="form-control" />
+                    <ValidationMessage For="() => Agent.CompanyId" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/agents">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int AgentId { get; set; }
+
+    [SupplyParameterFromForm]
+    private Agent? Agent { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Agent ??= await context.Agent.FirstOrDefaultAsync(m => m.AgentId == AgentId);
+
+        if (Agent is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateAgent()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Agent!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!AgentExists(Agent!.AgentId))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/agents");
+    }
+
+    private bool AgentExists(int agentid)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Agent.Any(e => e.AgentId == agentid);
+    }
+}
