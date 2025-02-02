@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using RealEstate.Data;
+using System.Text.Json.Serialization;
 
 namespace RealEstate.Domain
 {
@@ -11,8 +12,8 @@ namespace RealEstate.Domain
 
         //Navigation Property
         [JsonIgnore] // Prevent recursive serialization
-        public User User { get; set; }
-        public int UserId { get; set; }
+        public string UserId { get; set; }
+        public RealEstateUser User { get; set; }
 
         [JsonIgnore] // Prevent recursive serialization
         public Property? Property { get; set; }

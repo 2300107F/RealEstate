@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.General;
+using RealEstate.Data;
+using System.Reflection;
 
 namespace RealEstate.Domain
 {
@@ -10,6 +12,9 @@ namespace RealEstate.Domain
         public string Password { get; set; }
         public string AgentPhoneNumber { get; set; }
         public string LicenseNumber { get; set; }
+
+        public string UserId { get; set; }
+        public RealEstateUser User { get; set; }
 
         // Navigation Property
         public Company Company { get; set; }

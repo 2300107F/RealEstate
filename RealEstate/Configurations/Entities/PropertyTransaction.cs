@@ -10,15 +10,15 @@ namespace RealEstate.Configurations.Entities
         public void Configure(EntityTypeBuilder<PropertyTransaction> builder)
         {
             builder.HasData(
-            new PropertyTransaction
-            {
-                PropertyTransactionId = 1,
-                Amount = 800000,
-                TransactionDate = DateTime.Now,
-                UserId = 1,
-                PropertyId = 3,
+            //new PropertyTransaction
+            //{
+            //    PropertyTransactionId = 1,
+            //    Amount = 800000,
+            //    TransactionDate = DateTime.Now,
+            //    UserId = 1,
+            //    PropertyId = 3,
 
-            }
+            //}
             );
         }
     }

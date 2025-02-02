@@ -22,7 +22,7 @@ namespace RealEstate.Configurations.Entities
                 Bathrooms = 3,
                 Sqft = 1100,
                 Status = "Available",
-                AgentId = 1, // FK reference to Agent
+                //AgentId = 1, // FK reference to Agent
                 RegionId = 1
             },
             new Property
@@ -38,7 +38,7 @@ namespace RealEstate.Configurations.Entities
                 Bathrooms = 2,
                 Sqft = 700,
                 Status = "Available",
-                AgentId = 2, // Fk Reference to Agent
+                //AgentId = 2, // Fk Reference to Agent
                 RegionId = 1
             },
             new Property
@@ -54,7 +54,7 @@ namespace RealEstate.Configurations.Entities
                 Bathrooms = 2,
                 Sqft = 890,
                 Status = "Sold",
-                AgentId = 1,
+                //AgentId = 1,
                 RegionId = 2,
             }
             );
